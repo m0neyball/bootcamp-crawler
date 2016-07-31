@@ -79,9 +79,9 @@ class OpenGov extends Command
             $tidy = new tidy();
             $tidy->parseString($request->getBody()->getContents(), $config, 'utf8');
             $tidy->cleanRepair();
-            $cleaned_html  = tidy_get_output($tidy);
+            $cleanedHtml  = tidy_get_output($tidy);
 
-            $crawler = new Crawler($cleaned_html);
+            $crawler = new Crawler($cleanedHtml);
 
             $infos = $crawler->filter('tr')->each(function (Crawler $node) {
                 if ($node->filter('td')->count() === 9) {
@@ -98,6 +98,11 @@ class OpenGov extends Command
                     ];
                 }
             });
+
+            // show info
+            foreach ($infos as $info) {
+                var_dump(iterator_to_array($info));
+            }
 
         } catch (RequestException $e) {
             $this->error($e->getMessage());
