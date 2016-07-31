@@ -4,10 +4,9 @@ namespace App\Console\Commands;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
-use GuzzleHttp\Pool;
-use GuzzleHttp\Psr7\Request;
 use Symfony\Component\DomCrawler\Crawler;
 use Illuminate\Console\Command;
+use tidy;
 
 class OpenGov extends Command
 {
@@ -72,6 +71,34 @@ class OpenGov extends Command
                     'ctl00$contentPlaceHolder$btnQuery' => '查詢'
                 ]
             ]);
+
+            $config = [
+                'uppercase-attributes' => true,
+                'wrap' => 800
+            ];
+            $tidy = new tidy();
+            $tidy->parseString($request->getBody()->getContents(), $config, 'utf8');
+            $tidy->cleanRepair();
+            $cleaned_html  = tidy_get_output($tidy);
+
+            $crawler = new Crawler($cleaned_html);
+
+            $infos = $crawler->filter('tr')->each(function (Crawler $node) {
+                if ($node->filter('td')->count() === 9) {
+                    yield [
+                        'market' => $node->filter('td')->eq(0)->text(),
+                        'product' => $node->filter('td')->eq(1)->text(),
+                        'better_price' => $node->filter('td')->eq(2)->text(),
+                        'middle_price' =>$node->filter('td')->eq(3)->text(),
+                        'secondary_price' =>$node->filter('td')->eq(4)->text(),
+                        'avg' => $node->filter('td')->eq(5)->text(),
+                        'diff_yesterday＿avg_price' => $node->filter('td')->eq(6)->text(),
+                        'trading_volume' => $node->filter('td')->eq(7)->text(),
+                        'day_or' => $node->filter('td')->eq(8)->text()
+                    ];
+                }
+            });
+
         } catch (RequestException $e) {
             $this->error($e->getMessage());
         }
