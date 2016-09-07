@@ -1,0 +1,96 @@
+version: '2'
+
+services:
+    data:
+        build: .
+        volumes:
+            - /var/lib/mysql
+            - /var/lib/mariadb
+            - /var/lib/postgres
+            - /var/lib/redis
+            - /var/lib/memcached
+            - /var/lib/neo4j
+            - /var/lib/mongo
+    mariadb:
+        image: mariadb:10
+        container_name: mariadb
+        volumes_from:
+            - data
+        ports:
+            - "3306:3306"
+        environment:
+            MYSQL_DATABASE: homestead
+            MYSQL_USER: homestead
+            MYSQL_PASSWORD: secret
+            MYSQL_ROOT_PASSWORD: secret
+    percona:
+        image: percona:5.7
+        container_name: percona
+        volumes_from:
+            - data
+        ports:
+            - "3306:3306"
+        environment:
+            MYSQL_DATABASE: homestead
+            MYSQL_USER: homestead
+            MYSQL_PASSWORD: secret
+            MYSQL_ROOT_PASSWORD: secret
+    mysql:
+        image: mysql:5.7
+        container_name: mysql
+        volumes_from:
+            - data
+        ports:
+            - "3306:3306"
+        environment:
+            MYSQL_DATABASE: homestead
+            MYSQL_USER: homestead
+            MYSQL_PASSWORD: secret
+            MYSQL_ROOT_PASSWORD: secret
+    postgres:
+        image: postgres:9.6
+        container_name: postgres
+        volumes_from:
+            - data
+        ports:
+            - "5432:5432"
+        environment:
+            POSTGRES_DB: homestead
+            POSTGRES_USER: homestead
+            POSTGRES_PASSWORD: secret
+    mongo:
+            image: mongo:3.2
+            container_name: mongo
+            volumes_from:
+                - data
+            ports:
+                - "27017:27017"
+                - "27018:27018"
+    neo4j:
+            image: neo4j:3.0.3
+            container_name: neo4j
+            volumes_from:
+                - data
+            ports:
+                - "7473:7473"
+                - "7474:7474"
+    redis:
+        image: redis:3.2
+        container_name: redis
+        volumes_from:
+            - data
+        ports:
+            - "6379:6379"
+    memcached:
+        image: memcached:1.4
+        container_name: memcached
+        volumes_from:
+            - data
+        ports:
+            - "11211:11211"
+    elasticsearch:
+        image: itzg/elasticsearch
+        container_name: elasticsearch
+        ports:
+            - "9200:9200"
+            - "9300:9300"
